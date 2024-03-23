@@ -1,0 +1,2 @@
+class UnauthenticatedAccessException(Exception):
+    pass

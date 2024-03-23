@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Order Detail{% endblock %}
+
+{% block content %}
+<div x-data="tabs()" class="p-5">
+    <ul class="flex border-b">
+        <li class="-mb-px mr-1" :class="{'active': activeTab === 1}" @click="activeTab = 1">
+            <a class="bg-white inline-block py-2 px-4 font-semibold" href="#">Calendar</a>
+        </li>
+        <li class="mr-1" :class="{'active': activeTab === 2}" @click="activeTab = 2">
+            <a class="bg-white inline-block py-2 px-4 font-semibold" href="#">Daily Segments</a>
+        </li>
+        <!-- Add more tabs as needed -->
+    </ul>
+    <div class="tab-content">
+        <div x-show="activeTab === 1" class="p-4">
+            <div x-data="calendarComponent()" class="p-4" x-init="init()">
+                <div class="grid grid-cols-7 gap-2">
+            <!--show header for each day of the week starting on sunday-->
+                    <template x-for="(day, index) in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="index">
+                        <div class="text-center font-semibold text-gray-600">
+                            <span x-text="day"></span>
+                        </div>
+                    </template>
+                    <template x-for="(day, index) in days" :key="index">
+                        <div class="h-32 border border-gray-200 rounded shadow-sm" x-show="day.label">
+                            <!-- Correctly bind the hx-get URL using the day's date and ensure day.label is displayed -->
+                            <div :hx-get="'/order/order_plan_day?date=' + day.date" hx-trigger="load" class="text-center">
+
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <div x-show="activeTab === 2" class="p-4">
+            <!-- weekly view, 7 columns showing production segments for each day and the products to manufactur to fulfil the orders made on that day -->
+            <div x-data="weeklyComponent()" class="p-4" x-init="init()">
+                <div class="grid grid-cols-7 gap-2">
+                <!--show header for each day of the week starting on sunday-->
+                    <template x-for="(day, index) in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="index">
+                        <div class="text-center font-semibold text-gray-600">
+                            <span x-text="day"></span>
+                        </div>
+                    </template>
+                     <template x-for="(day, index) in days" :key="index">
+                        <div class="border border-gray-200 rounded shadow-sm" x-show="day.label">
+                            <!-- Correctly bind the hx-get URL using the day's date and ensure day.label is displayed -->
+                            <div :hx-get="'/order/order_segment_day?date=' + day.date" hx-trigger="load" class="text-center">
+
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <!-- Add more tab contents as needed -->
+    </div>
+</div>
+
+<script>
+function tabs() {
+    return {
+        activeTab: 1, // Default to first tab
+        init() {
+            // Any initialization work goes here
+        }
+    };
+}
+
+function weeklyComponent() {
+    return {
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear(),
+        startDayOfWeek: 0, // Configurable start day of the week (0 = Sunday, 1 = Monday, etc.)
+        days: [],
+        init() {
+            this.calculateWeekdays();
+        },
+        calculateWeekdays() {
+            // calculate 7 days from the current week
+            this.days = []; // Reset days array
+            const today = new Date();
+            const day = today.getDay();
+            const diff = today.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+            const monday = new Date(today.setDate(diff));
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+                this.days.push({
+                    label: day.getDate().toString(),
+                    date: day.toISOString().split('T')[0], // 'YYYY-MM-DD'
+                    isCurrentMonth: true // Mark as day from the current month
+                });
+            }
+        },
+    };
+}
+
+function calendarComponent() {
+    return {
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear(),
+        startDayOfWeek: 0, // Configurable start day of the week (0 = Sunday, 1 = Monday, etc.)
+        days: [],
+        init() {
+            this.calculateDays();
+        },
+        calculateDays() {
+            this.days = []; // Reset days array
+
+            // First and last day of the current month
+            const firstDayCurrentMonth = new Date(this.currentYear, this.currentMonth, 1);
+            const lastDayCurrentMonth = new Date(this.currentYear, this.currentMonth + 1, 0);
+
+            // Calculate days from the previous month to show
+            const daysFromPrevMonth = (firstDayCurrentMonth.getDay() - this.startDayOfWeek + 7) % 7;
+
+            // Add days from the previous month
+            const prevMonth = new Date(this.currentYear, this.currentMonth, -daysFromPrevMonth + 1);
+            for (let i = 0; i < daysFromPrevMonth; i++) {
+                const day = new Date(prevMonth.getFullYear(), prevMonth.getMonth(), prevMonth.getDate() + i);
+                this.days.push({
+                    label: day.getDate().toString(),
+                    date: day.toISOString().split('T')[0], // 'YYYY-MM-DD'
+                    isPrevMonth: true // Mark as day from the previous month
+                });
+            }
+
+            // Add days of the current month
+            const daysInCurrentMonth = lastDayCurrentMonth.getDate();
+            for (let i = 1; i <= daysInCurrentMonth; i++) {
+                const day = new Date(this.currentYear, this.currentMonth, i);
+                this.days.push({
+                    label: i.toString(),
+                    date: day.toISOString().split('T')[0], // 'YYYY-MM-DD'
+                    isCurrentMonth: true // Mark as day from the current month
+                });
+            }
+
+            // Calculate and add days from the next month
+            const daysToFill = 42 - this.days.length; // Total grid cells (6 weeks * 7 days) minus current cells filled
+            for (let i = 1; i <= daysToFill; i++) {
+                const day = new Date(this.currentYear, this.currentMonth + 1, i);
+                this.days.push({
+                    label: i.toString(),
+                    date: day.toISOString().split('T')[0], // 'YYYY-MM-DD'
+                    isNextMonth: true // Mark as day from the next month
+                });
+            }
+        },
+    };
+}
+</script>
+
+
+{% endblock %}

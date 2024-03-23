@@ -1,0 +1,31 @@
+<div class="w-full overflow-hidden rounded-lg shadow-xs">
+  <div class="w-full overflow-x-auto">
+    <table class="w-full whitespace-no-wrap">
+      <thead>
+        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+          <th class="px-4 py-3">Actions</th>
+          <th class="px-4 py-3">Order ID</th>
+          <th class="px-4 py-3">Order Date</th>
+          <th class="px-4 py-3">Customer ID</th>
+          <th class="px-4 py-3">Customer Name</th>
+          <th class="px-4 py-3">Order Total</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y">
+        {% for order in orders %}
+        <tr class="text-gray-700">
+          <td>
+            <a href="/order/edit/{{ order.order_id }}" class="mdi mdi-pencil-outline text-2xl text-blue-500 hover:text-blue-700"></a>
+            <a href="/order/delete/{{ order.order_id }}" class="mdi mdi-delete-outline text-2xl text-red-500 hover:text-red-700"></a>
+          </td>
+          <td class="px-4 py-3">{{ order.order_id }}</td>
+          <td class="px-4 py-3">{{ order.order_date }}</td>
+          <td class="px-4 py-3">{{ order.customer_id }}</td>
+          <td class="px-4 py-3">{{ order.customer_name }}</td>
+          <td class="px-4 py-3">{{ order.order_total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

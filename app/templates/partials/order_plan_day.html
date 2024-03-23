@@ -1,0 +1,12 @@
+<!-- order_plan_day.html -->
+<div class="p-2">
+    <h3 class="text-lg font-semibold text-gray-800">{{ date }}</h3>
+    <div class="mt-2">
+        {% if order_count > 0 %}
+        <p class="text-sm text-gray-600">Orders today: {{ order_count }}</p>
+        <p class="text-sm text-gray-600">Total amount: ${{ order_total }}</p>
+        {% else %}
+        <p class="text-sm text-gray-600">No orders for this day.</p>
+        {% endif %}
+    </div>
+</div>

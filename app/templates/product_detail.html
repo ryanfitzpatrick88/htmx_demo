@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Product Detail{% endblock %}
+
+{% block content %}
+<div class="p-5" x-data="productEditor" x-init="init()">
+    <h2 class="text-2xl font-bold mb-4">{{ product.name }}</h2>
+    <div class="grid grid-cols-[200px_minmax(900px,_1fr)_200px] h-full gap-4">
+        <div>
+            <img src="https://picsum.photos/200/200" alt="{{ product.name }}" class="w-auto h-auto">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <template x-for="(value, key) in properties" :key="key">
+                <div class="flex flex-row">
+                    <strong class="basis-1/4 ml-auto" x-text="key.charAt(0).toUpperCase() + key.slice(1) + ':'"></strong>
+                    <span class="basis-2/4"
+                          @click="edit(key)" x-text="value"
+                          :contenteditable="editingKey === key"></span>
+                    <div class="basis-1/4">
+                        <button x-show="editingKey === key" @click="cancel(key)">
+                            <i class="mdi mdi-close"></i>
+                        </button>
+                        <button x-show="editingKey === key" @click="saveChanges(key)">
+                            <i class="mdi mdi-check"></i>
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+<div x-data="{ showToast: false, message: '' }" @message-received.window="showToast = true; message = $event.detail; setTimeout(() => showToast = false, 3000);">
+    <!-- Toast Notification -->
+    <div x-show="showToast" class="fixed bottom-5 right-5 bg-blue-500 text-white p-4 rounded-lg" x-text="message"></div>
+</div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('productEditor', () => ({
+            productId: '{{ product.id }}',
+            properties: {{ product|tojson }},
+            editingKey: null,
+            originalValues: {},
+            init() {
+                // Populate originalValues with the properties
+                this.originalValues = {...this.properties};
+                this.listenForUpdates();
+            },
+            edit(key) {
+                this.editingKey = key;
+            },
+            cancel(key) {
+                console.log('Cancelling changes for', key);
+                document.querySelector(`[contenteditable]`).innerText = this.originalValues[key];
+                this.editingKey = null;
+            },
+            saveChanges(key) {
+                //const newValue = this.properties[key];
+                newValue = document.querySelector(`[contenteditable]`).innerText;
+
+                console.log('Saving changes for', key, newValue);
+                fetch(`/product/update/${this.productId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({[key]: newValue}),
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    this.editingKey = null;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            },
+            listenForUpdates() {
+                const ws = new WebSocket('ws://localhost:8000/ws');
+                ws.onmessage = (event) => {
+                    const productUpdate = JSON.parse(event.data);
+
+                    window.dispatchEvent(new CustomEvent('message-received', {
+                        detail: 'Product updated successfully!'
+                    }));
+                };
+            },
+        }));
+    });
+</script>
+{% endblock %}

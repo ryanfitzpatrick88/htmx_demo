@@ -1,0 +1,19 @@
+<!-- show a production segment fo rthe day which shows a block for every hour of the day and where the orders product's are bing produced -->
+<div class="p-2">
+    <h3 class="text-lg font-semibold text-gray-800">{{ date }}</h3>
+    <div class="mt-2">
+        <!-- Show the production segments for the day -->
+        <div class="grid grid-cols-24 gap-2">
+            <template x-for="(hour, index) in 24" :key="index">
+                <div class="h-8 border
+                            border-gray-200
+                            rounded
+                            shadow-sm">
+                    <div class="text-center">
+                        <span x-text="hour"></span>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>

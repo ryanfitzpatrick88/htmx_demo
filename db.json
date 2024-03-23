@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "username": "test",
+        "email": "test",
+        "hashed_password": "$2b$12$PzDnusSZR2AgF9AE4qWd1uJu.4xoJ6kF3GWUPmtOoG204aFAl7nna",
+        "is_active": true
+    },
+    {
+        "id": 2,
+        "username": "test2",
+        "email": "test2",
+        "hashed_password": "$2b$12$lnxpyjkeZ/IVRXNpEOxG3ezBTl8BboFFSb6rv0Zdptp48kZfR8UoK",
+        "is_active": true
+    },
+    {
+        "id": 3,
+        "username": "test3",
+        "email": "test@test.com",
+        "hashed_password": "$2b$12$Z0ySBb97v6wYRLo411wkeueq.E18Y7w7Er803LMWX94ZzO9.VcDqq",
+        "is_active": true
+    },
+    {
+        "id": 4,
+        "username": "ryan",
+        "email": "test",
+        "hashed_password": "$2b$12$3Ogo8BRCAbILjnYnHhRzVecz45hwK.DAeez1py7EXf5S4lvB8rY4u",
+        "is_active": null
+    },
+    {
+        "id": 5,
+        "username": "ryan2",
+        "email": "test",
+        "hashed_password": "$2b$12$in/SI/OBqxcI2eV7g0v.xuFqNI7vOA/0/r3cPMZArxsdML1FBQSji",
+        "is_active": null
+    }
+]

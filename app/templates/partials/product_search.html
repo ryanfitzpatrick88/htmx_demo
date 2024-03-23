@@ -1,0 +1,22 @@
+{% for product in products %}
+<div class="product-card">
+    <!-- Example of a single product card -->
+    <div class="bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden">
+        <img src="https://picsum.photos/200/400?random={{product.id}}" alt="Product Image" class="w-full h-48 object-cover object-center">
+        <div class="p-4">
+            <h5 class="text-lg font-bold">{{ product.name }}</h5>
+            <p class="text-gray-700">{{ product.description }}</p>
+            <p class="text-gray-900">${{ "%.2f" % product.price }}</p>
+            <div class="grid grid-cols-2">
+                <a href="#" class="inline-block mt-2 text-blue-500 hover:text-blue-600">Learn more</a>
+                <a href="#" class="mdi mdi-plus text-2xl text-green-500 hover:text-green-600" data-product-id="{{ product.id }}"
+                   @click="$dispatch('add-item', { order_item_id: 0, product_id: {{ product.id }}, product_name: '{{ product.name | escape }}', item_quantity: 0, item_price: {{ product.price }} })">Add</a>
+            </div>
+        </div>
+    </div>
+    <!-- Repeat for other products -->
+<!--    hx-post="/order/add-order-item" hx-vals='{"product_id": "{{ product.id }}"}' hx-target="#order-items-container" hx-swap="outerHTML" -->
+</div>
+{% else %}
+<p>No products found.</p>
+{% endfor %}

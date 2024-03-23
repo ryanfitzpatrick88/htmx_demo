@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My App{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.11" integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="raleway-body flex flex-col min-h-screen">
+    <header class="bg-blue-500 text-white p-4">
+        {% block header %}
+        <h1 class="text-4xl"><span class="mdi mdi-language-html5 mr-3 text-4xl"></span>HTMX Demo</h1>
+        {% endblock %}
+    </header>
+
+    <div class="flex flex-1">
+        <aside class="w-64 bg-gray-800 text-white p-4">
+            {% block sidebar %}
+            <nav>
+                <ul>
+            {% if user %}
+                <!-- User is logged in -->
+                <li><span class="mdi mdi-view-dashboard mr-3 text-xl"></span><a hx-boost="true" href="/">Home</a></li>
+                <li><span class="mdi mdi-shape mr-3 text-xl"></span><a hx-boost="true" href="/product">Products</a></li>
+                <li><span class="mdi mdi-invoice-list mr-3 text-xl"></span><a hx-boost="true" href="/order">Orders</a></li>
+                <li><span class="mdi mdi-domain mr-3 text-xl"></span><a hx-boost="true" href="/order/order_plan">Order Plan</a></li>
+                <li>
+                    <form action="/logout" method="POST" hx-post="/auth/logout" hx-redirect="/auth/login">
+                        <span class="mdi mdi-logout mr-3 text-xl"></span><button type="submit">Logout</button>
+                    </form>
+                </li>
+            {% else %}
+                <!-- User is not logged in -->
+                <li><span class="mdi mdi-login mr-3"></span><a href="/auth/login">Login</a></li>
+            {% endif %}
+                </ul>
+            {% endblock %}
+            </nav>
+        </aside>
+        <main class="flex-1 p-4 overflow-auto">
+            {% block content %}Content area{% endblock %}
+        </main>
+    </div>
+
+    <footer class="bg-gray-700 text-white p-4">
+        {% block footer %}HTMX Demo 2024{% endblock %}
+    </footer>
+
+    {% block javascript %}{% endblock %}
+</body>
+</html>

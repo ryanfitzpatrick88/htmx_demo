@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div x-data="{ showModal: false }">
+    <div class="p-5">
+        <button @click="showModal = true" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Add Product</button>
+    </div>
+
+    <!-- Modal Dialog -->
+    <div x-show="showModal" @htmx:afterOnLoad="showModal = false"
+         class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-5 rounded-lg">
+            <form id="add-product-form" hx-post="add/" hx-swap="outerHTML">
+                <div class="grid grid-flow-row grid-col-3 gap-4">
+                    <div class="col-span-2">
+                        <label for="name" class="block text-sm font-medium text-gray-700">Product Name</label>
+                        <input type="text" name="name" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700">Product Price</label>
+                        <input type="number" name="price" id="price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700">Product Quantity</label>
+                        <input type="number" name="quantity" id="quantity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700">Product Category</label>
+                        <input type="text" name="category" id="category" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="brand" class="block text-sm font-medium text-gray-700">Product Brand</label>
+                        <input type="text" name="brand" id="brand" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="sku" class="block text-sm font-medium text-gray-700">Product SKU</label>
+                        <input type="text" name="sku" id="sku" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="color" class="block text-sm font-medium text-gray-700">Product Color</label>
+                        <input type="text" name="color" id="color" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="size" class="block text-sm font-medium text-gray-700">Product Size</label>
+                        <input type="text" name="size" id="size" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label for="weight" class="block text-sm font-medium text-gray-700">Product Weight</label>
+                        <input type="number" name="weight" id="weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div class="col-span-3">
+                        <label for="description" class="block text-sm font-medium text-gray-700">Product Description</label>
+                        <textarea name="description" id="description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" @click="showModal = false" class="mr-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700">Cancel</button>
+                    <button type="submit" @click="showModal = false" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div x-data="productList()">
+    <!-- Product List -->
+    <div class="w-full overflow-hidden rounded-lg shadow-xs">
+      <div class="w-full overflow-x-auto">
+        <table class="w-full whitespace-no-wrap">
+          <thead>
+            <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b bg-gray-50">
+              <th class="px-4 py-3">Actions</th>
+              <th class="px-4 py-3">Name</th>
+              <th class="px-4 py-3">Description</th>
+              <th class="px-4 py-3">Price</th>
+              <th class="px-4 py-3">Quantity</th>
+              <th class="px-4 py-3">Category</th>
+              <th class="px-4 py-3">Brand</th>
+              <th class="px-4 py-3">Color</th>
+              <th class="px-4 py-3">Size</th>
+              <th class="px-4 py-3">Weight</th>
+              <th class="px-4 py-3">SKU</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y">
+           <template x-for="product in products" :key="product.id">
+            <tr class="text-gray-700">
+              <td>
+                <a :href="'/product/edit/' + product.id" class="mdi mdi-pencil-outline text-2xl text-blue-500 hover:text-blue-700"></a>
+                <a href="'/product/delete/' + product.id" class="mdi mdi-delete-outline text-2xl text-red-500 hover:text-red-700"></a>
+                <a href="/order/" class="mdi mdi-invoice-plus-outline text-2xl text-green-500 hover:text-green-700"></a>
+              </td>
+              <td class="px-4 py-3"><span x-text="product.name"></span></td>
+              <td class="px-4 py-3"><span x-text="product.description"></span></td>
+              <td class="px-4 py-3"><span x-text="product.price"></span></td>
+              <td class="px-4 py-3"><span x-text="product.quantity"></span></td>
+              <td class="px-4 py-3"><span x-text="product.category"></span></td>
+              <td class="px-4 py-3"><span x-text="product.brand"></span></td>
+              <td class="px-4 py-3"><span x-text="product.color"></span></td>
+              <td class="px-4 py-3"><span x-text="product.size"></span></td>
+              <td class="px-4 py-3"><span x-text="product.weight"></span></td>
+              <td class="px-4 py-3"><span x-text="product.sku"></span></td>
+            </tr>
+           </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+<div x-data="{ showToast: false, message: '' }" @message-received.window="showToast = true; message = $event.detail; setTimeout(() => showToast = false, 3000);">
+    <!-- Toast Notification -->
+    <div x-show="showToast" class="fixed bottom-5 right-5 bg-blue-500 text-white p-4 rounded-lg" x-text="message"></div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        {% include "product_list.js" %}
+    </script>
+{% endblock %}
